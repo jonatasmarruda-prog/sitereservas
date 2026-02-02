@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -12,13 +14,10 @@ body{margin:0;background:#0c0c0c;font-family:Poppins,sans-serif;color:#fff}
 .container{max-width:520px;margin:auto;padding:14px}
 .card{background:#151515;border-radius:22px;padding:16px;box-shadow:0 0 25px rgba(0,0,0,.7)}
 
-.banner img{width:100%;border-radius:18px;margin-bottom:10px}
+.banner img{width:100%;border-radius:18px}
 
-.titulo{font-size:22px;font-weight:700;text-align:center}
-.desc{font-size:14px;color:#ddd;line-height:1.5;margin:8px 0}
-
-.escolha-passeio{text-align:center;margin:10px 0}
-.escolha-passeio p{font-size:20px;font-weight:800;color:#00ff9c;margin-bottom:6px}
+.escolha-passeio{text-align:center;margin:14px 0}
+.escolha-passeio p{font-size:22px;font-weight:800;color:#00ff9c;margin-bottom:6px}
 .escolha-passeio select{
   width:100%;
   padding:16px;
@@ -29,6 +28,9 @@ body{margin:0;background:#0c0c0c;font-family:Poppins,sans-serif;color:#fff}
   background:linear-gradient(135deg,#00c96b,#00ff9c);
   color:#000;
 }
+
+.titulo{font-size:22px;font-weight:700;text-align:center;margin:6px 0}
+.desc{font-size:14px;color:#ddd;line-height:1.5;margin-bottom:8px}
 
 label{margin-top:10px;display:block;font-weight:600}
 select,input{
@@ -42,12 +44,13 @@ select,input{
 
 .info-combo{
   font-size:14px;
-  color:#ccc;
+  color:#ffeb3b;
   text-align:center;
   margin:8px 0;
+  font-weight:600;
 }
 
-.info{text-align:center;margin-top:8px;font-size:14px}
+.info{text-align:center;margin-top:6px;font-size:14px}
 .total{font-size:22px;font-weight:700;text-align:center;color:#00ff9c;margin-top:8px}
 
 .ultimas{
@@ -61,12 +64,7 @@ select,input{
   margin-top:8px;
   animation:pulse 1s infinite;
 }
-
-@keyframes pulse{
-  0%{opacity:1}
-  50%{opacity:.5}
-  100%{opacity:1}
-}
+@keyframes pulse{0%{opacity:1}50%{opacity:.5}100%{opacity:1}}
 
 .btn{
   width:100%;
@@ -78,7 +76,6 @@ select,input{
   font-weight:700;
   color:#fff;
 }
-
 .pix{background:linear-gradient(135deg,#00ff9c,#00c96b)}
 .whats{background:linear-gradient(135deg,#25d366,#1ebd5c)}
 
@@ -103,120 +100,129 @@ const passeios = {
     banner:"https://i.postimg.cc/vZLwxjSc/Copia-de-Post-instagram-dia-dos-povos-indigenas-ousado-verde.png",
     vagasKey:"vagas_chapada",
     vagasTotal:30,
-    valorAdulto:{pix:360,cartao:380},
-    valorCrianca:{pix:360,cartao:380} // mesma regra
+    texto:"🏕️ Camping | 🛏️ Quarto compartilhado | 🛌 Casal<br>👶 Crianças até 10 anos: compartilhado R$ 320",
+    valores:{
+      adulto:{ pix:360, cartao:380 },
+      crianca:{ pix:320, cartao:320 }
+    }
   },
+
   lagoa:{
     nome:"Lagoa Azul",
     banner:"https://i.postimg.cc/7hYnXCqs/Instagram-Post-Agencia-de-Viagem-Moderno-Azul-e-Branco.png",
     vagasKey:"vagas_lagoa",
     vagasTotal:28,
-    valorAdulto:{pix:336,cartao:340},
-    valorCrianca:{pix:280,cartao:280}
+    texto:"👶 Crianças até 10 anos: R$ 280<br>🚗 Veículo próprio: R$ 215<br>ℹ️ Todos somam vagas",
+    valores:{
+      adulto:{ pix:336, cartao:340 },
+      crianca:{ pix:280, cartao:280 },
+      carro:{ pix:215, cartao:215 }
+    }
   },
+
   vale:{
     nome:"Vale do Chico",
     banner:"https://i.postimg.cc/9fb4bL0K/Travel-Instagram-Post-in-Blue-Green-Refined-Scrapbook-Style.png",
     vagasKey:"vagas_vale",
     vagasTotal:28,
-    valorAdulto:{pix:365,cartao:379},
-    valorCrianca:{pix:295,cartao:309}
+    texto:"💑 Casal equivale a 2 vagas<br>👶 Crianças até 10 anos têm valor diferenciado",
+    valores:{
+      adulto:{ pix:365, cartao:379 },
+      crianca:{ pix:295, cartao:309 },
+      casal:{ pix:700, cartao:729 }
+    }
   }
 };
 
-let passeioAtual = "chapada";
-let vagasDisponiveis = 0;
+let passeioAtual="chapada", vagasDisponiveis=0;
 
-function initPasseio(){
-  const p = passeios[passeioAtual];
-  banner.src = p.banner;
-  titulo.innerText = p.nome;
+function carregar(){
+  const p=passeios[passeio.value];
+  passeioAtual=passeio.value;
+  banner.src=p.banner;
+  titulo.innerText=p.nome;
+  descricao.innerHTML=p.texto;
 
-  vagasDisponiveis = localStorage.getItem(p.vagasKey);
-  if(vagasDisponiveis === null){
-    vagasDisponiveis = p.vagasTotal;
-    localStorage.setItem(p.vagasKey, vagasDisponiveis);
+  vagasDisponiveis=localStorage.getItem(p.vagasKey);
+  if(vagasDisponiveis===null){
+    vagasDisponiveis=p.vagasTotal;
+    localStorage.setItem(p.vagasKey,vagasDisponiveis);
   }
-  vagasDisponiveis = parseInt(vagasDisponiveis);
+  vagasDisponiveis=parseInt(vagasDisponiveis);
 
-  atualizarResumo();
+  atualizar();
 }
 
-function atualizarResumo(){
-  const adultos = parseInt(qtdAdulto.value);
-  const criancas = parseInt(qtdCrianca.value);
-  const totalVagas = adultos + criancas;
+function atualizar(){
+  const adultos=parseInt(qtdAdulto.value);
+  const criancas=parseInt(qtdCrianca.value);
+  const carro=parseInt(qtdCarro.value||0);
+  const casais=parseInt(qtdCasal.value||0);
 
-  infoVagas.innerHTML = `🎟️ Vagas restantes: <b>${vagasDisponiveis}</b>`;
+  let totalVagas=adultos+criancas+carro+(casais*2);
 
-  if(totalVagas === 0){
-    total.innerText = "💰 Selecione as vagas";
+  infoVagas.innerHTML=`🎟️ Vagas restantes: <b>${vagasDisponiveis}</b>`;
+
+  if(totalVagas===0){
+    total.innerText="💰 Selecione as vagas";
     return;
   }
 
-  if(totalVagas > vagasDisponiveis){
+  if(totalVagas>vagasDisponiveis){
     alert("Quantidade maior que as vagas disponíveis.");
     return;
   }
 
-  const p = passeios[passeioAtual];
-  const forma = pagamento.value;
+  const f=pagamento.value;
+  const v=passeios[passeioAtual].valores;
 
-  const valorTotal =
-    adultos * p.valorAdulto[forma] +
-    criancas * p.valorCrianca[forma];
+  let valor=
+    (adultos*(v.adulto?.[f]||0))+
+    (criancas*(v.crianca?.[f]||0))+
+    (carro*(v.carro?.[f]||0))+
+    (casais*(v.casal?.[f]||0));
 
-  total.innerText = `🎟️ ${totalVagas} vagas | 💰 R$ ${valorTotal}`;
+  total.innerText=`🎟️ ${totalVagas} vagas | 💰 R$ ${valor}`;
 
-  if((vagasDisponiveis - totalVagas) <= 5){
-    ultimas.style.display = "block";
-  }else{
-    ultimas.style.display = "none";
-  }
+  ultimas.style.display=(vagasDisponiveis-totalVagas<=5)?"block":"none";
 }
 
 function confirmar(){
-  const nome = nomeCliente.value.trim();
-  if(!nome) return alert("Informe seu nome.");
+  const nome=nomeCliente.value.trim();
+  if(!nome)return alert("Informe seu nome.");
 
-  const adultos = parseInt(qtdAdulto.value);
-  const criancas = parseInt(qtdCrianca.value);
-  const totalVagas = adultos + criancas;
+  const adultos=parseInt(qtdAdulto.value);
+  const criancas=parseInt(qtdCrianca.value);
+  const carro=parseInt(qtdCarro.value||0);
+  const casais=parseInt(qtdCasal.value||0);
+  const totalVagas=adultos+criancas+carro+(casais*2);
 
-  if(totalVagas === 0) return alert("Selecione as vagas.");
+  if(totalVagas===0)return alert("Selecione as vagas.");
+  if(totalVagas>vagasDisponiveis)return alert("Vagas insuficientes.");
 
-  if(totalVagas > vagasDisponiveis) return alert("Vagas insuficientes.");
+  vagasDisponiveis-=totalVagas;
+  localStorage.setItem(passeios[passeioAtual].vagasKey,vagasDisponiveis);
 
-  vagasDisponiveis -= totalVagas;
-  localStorage.setItem(passeios[passeioAtual].vagasKey, vagasDisponiveis);
-
-  if(pagamento.value === "pix"){
+  if(pagamento.value==="pix"){
     navigator.clipboard.writeText(PIX);
-    alert("✅ PIX copiado! Envie o comprovante para garantir sua vaga.");
+    alert("PIX copiado! Envie o comprovante para garantir sua vaga.");
   }else{
-    alert("💳 Pagamento no cartão.\nFale com o Jonatas para gerar o link.\nApós o pagamento, envie o comprovante.");
+    alert("Pagamento no cartão: fale com o Jonatas para gerar o link.\nApós o pagamento, envie o comprovante.");
   }
 
-  const msg = `
-Reserva de passeio:
+  const msg=`Reserva de passeio:
 ${passeios[passeioAtual].nome}
-
 Nome: ${nome}
 Adultos: ${adultos}
 Crianças: ${criancas}
-Total de vagas: ${totalVagas}
+Carro próprio: ${carro}
+Casais: ${casais}
 ${total.innerText}
 
-Segue comprovante para garantir minha vaga.
-`;
+Segue comprovante para garantir minha vaga.`;
 
   window.open(`https://wa.me/${WHATS}?text=${encodeURIComponent(msg)}`);
-  atualizarResumo();
-}
-
-function trocarPasseio(){
-  passeioAtual = passeio.value;
-  initPasseio();
+  atualizar();
 }
 </script>
 </head>
@@ -225,13 +231,11 @@ function trocarPasseio(){
 <div class="container">
 <div class="card">
 
-<div class="banner">
-<img id="banner">
-</div>
+<div class="banner"><img id="banner"></div>
 
 <div class="escolha-passeio">
 <p>👇 ESCOLHA SEU PASSEIO 👇</p>
-<select id="passeio" onchange="trocarPasseio()">
+<select id="passeio" onchange="carregar()">
   <option value="chapada">🌄 Chapada dos Guimarães</option>
   <option value="lagoa">💙 Lagoa Azul</option>
   <option value="vale">🌿 Vale do Chico</option>
@@ -239,51 +243,46 @@ function trocarPasseio(){
 </div>
 
 <div class="titulo" id="titulo"></div>
+<div class="desc" id="descricao"></div>
 
 <label>Nome completo</label>
 <input id="nomeCliente">
 
-<p class="info-combo">
-ℹ️ Você pode combinar adultos e crianças.
-Exemplo: 2 adultos + 1 criança = 3 vagas.
-</p>
-
 <label>Adultos</label>
-<select id="qtdAdulto" onchange="atualizarResumo()">
-  <option value="0">0</option>
-  <option value="1">1</option>
-  <option value="2">2</option>
-  <option value="3">3</option>
-  <option value="4">4</option>
+<select id="qtdAdulto" onchange="atualizar()">
+<option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
 </select>
 
-<label>Crianças (até 10 anos)</label>
-<select id="qtdCrianca" onchange="atualizarResumo()">
-  <option value="0">0</option>
-  <option value="1">1</option>
-  <option value="2">2</option>
+<label>Crianças até 10 anos</label>
+<select id="qtdCrianca" onchange="atualizar()">
+<option>0</option><option>1</option><option>2</option>
+</select>
+
+<label>Veículo próprio (Lagoa Azul)</label>
+<select id="qtdCarro" onchange="atualizar()">
+<option>0</option><option>1</option><option>2</option>
+</select>
+
+<label>Casal (Vale do Chico)</label>
+<select id="qtdCasal" onchange="atualizar()">
+<option>0</option><option>1</option><option>2</option>
 </select>
 
 <div id="infoVagas" class="info"></div>
-<div id="ultimas" class="ultimas">⚠️ ÚLTIMAS VAGAS DISPONÍVEIS!</div>
+<div id="ultimas" class="ultimas">⚠️ ÚLTIMAS VAGAS!</div>
 <div id="total" class="total"></div>
 
 <label>Forma de pagamento</label>
-<select id="pagamento" onchange="atualizarResumo()">
-  <option value="pix">PIX</option>
-  <option value="cartao">Cartão de crédito</option>
+<select id="pagamento" onchange="atualizar()">
+<option value="pix">PIX</option>
+<option value="cartao">Cartão de crédito</option>
 </select>
 
 <button class="btn pix" onclick="confirmar()">CONFIRMAR E ENVIAR COMPROVANTE</button>
 
-<div id="alerta" class="alerta">❌ VAGAS PREENCHIDAS</div>
-
 </div>
 </div>
 
-<script>
-initPasseio();
-</script>
+<script>carregar();</script>
 </body>
 </html>
-
