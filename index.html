@@ -28,7 +28,6 @@ body{margin:0;background:#0c0c0c;font-family:Poppins,sans-serif;color:#fff}
 }
 
 .titulo{font-size:22px;font-weight:700;text-align:center;margin:6px 0}
-.desc{font-size:14px;color:#ddd;line-height:1.5;margin-bottom:8px}
 
 label{margin-top:10px;display:block;font-weight:600}
 select,input{
@@ -40,7 +39,6 @@ select,input{
   color:#fff;
 }
 
-.info{text-align:center;margin-top:6px;font-size:14px}
 .total{font-size:22px;font-weight:700;text-align:center;color:#00ff9c;margin-top:8px}
 
 .resumo{
@@ -50,18 +48,6 @@ select,input{
   font-size:14px;
   margin-top:10px;
   line-height:1.6;
-}
-
-.ultimas{
-  display:none;
-  background:#ff1744;
-  color:#fff;
-  font-weight:800;
-  text-align:center;
-  padding:12px;
-  border-radius:14px;
-  margin-top:8px;
-  animation:pulse .8s infinite;
 }
 
 .aviso-final{
@@ -79,11 +65,10 @@ select,input{
   border:none;
   font-size:18px;
   font-weight:700;
-  color:#fff;
+  color:#000;
+  background:linear-gradient(135deg,#00ff9c,#00c96b);
 }
-.pix{background:linear-gradient(135deg,#00ff9c,#00c96b)}
-button:disabled{opacity:.4}
-.alerta{display:none;background:#550000;padding:12px;border-radius:12px;text-align:center;font-weight:700;margin-top:10px}
+
 </style>
 
 <script>
@@ -94,10 +79,8 @@ const passeios={
   chapada:{
     nome:"Chapada dos Guimarães",
     banner:"https://i.postimg.cc/vZLwxjSc/Copia-de-Post-instagram-dia-dos-povos-indigenas-ousado-verde.png",
-    vagasKey:"vagas_chapada",
-    vagasTotal:30,
     valores:{
-      camping:{pix:360,cartao:380},
+      camping:{pix:320,cartao:340},
       compartilhado:{pix:360,cartao:380},
       casal:{pix:560,cartao:590},
       crianca:{pix:320,cartao:320}
@@ -106,8 +89,6 @@ const passeios={
   lagoa:{
     nome:"Lagoa Azul",
     banner:"https://i.postimg.cc/7hYnXCqs/Instagram-Post-Agencia-de-Viagem-Moderno-Azul-e-Branco.png",
-    vagasKey:"vagas_lagoa",
-    vagasTotal:28,
     valores:{
       adulto:{pix:336,cartao:340},
       crianca:{pix:280,cartao:280},
@@ -117,8 +98,6 @@ const passeios={
   vale:{
     nome:"Vale do Chico",
     banner:"https://i.postimg.cc/9fb4bL0K/Travel-Instagram-Post-in-Blue-Green-Refined-Scrapbook-Style.png",
-    vagasKey:"vagas_vale",
-    vagasTotal:28,
     valores:{
       adulto:{pix:365,cartao:379},
       crianca:{pix:295,cartao:309}
@@ -126,85 +105,71 @@ const passeios={
   }
 };
 
-let passeioAtual="chapada",vagasDisponiveis=0;
+let passeioAtual="chapada";
 
 function carregar(){
   passeioAtual=passeio.value;
-  const p=passeios[passeioAtual];
-  banner.src=p.banner;
-  titulo.innerText=p.nome;
+  banner.src=passeios[passeioAtual].banner;
+  titulo.innerText=passeios[passeioAtual].nome;
 
-  vagasDisponiveis=localStorage.getItem(p.vagasKey)||p.vagasTotal;
-  localStorage.setItem(p.vagasKey,vagasDisponiveis);
-  vagasDisponiveis=parseInt(vagasDisponiveis);
+  boxHospedagem.style.display = passeioAtual==="chapada"?"block":"none";
+  boxCarro.style.display = passeioAtual==="lagoa"?"block":"none";
+  boxCasalNomes.style.display = "none";
 
-  resetar();
-  controlarCampos();
   atualizar();
 }
 
-function resetar(){
-  qtdAdulto.value=0;
-  qtdCrianca.value=0;
-  qtdCarro.value=0;
-  nomeCasal1.value="";
-  nomeCasal2.value="";
-}
-
-function controlarCampos(){
-  boxHospedagem.style.display="none";
-  boxCarro.style.display="none";
-  boxCasalNomes.style.display="none";
-
-  if(passeioAtual==="chapada"){
-    boxHospedagem.style.display="block";
-    if(tipoHospedagem.value==="casal"){
-      boxCasalNomes.style.display="block";
-    }
-  }
-
-  if(passeioAtual==="lagoa"){
-    boxCarro.style.display="block";
-  }
-}
-
 function atualizar(){
-  let totalVagas=0,valor=0;
+  let total=0, vagas=0;
   const f=pagamento.value;
 
   if(passeioAtual==="chapada"){
     const tipo=tipoHospedagem.value;
-    const qtd=parseInt(qtdAdulto.value);
-    const cri=parseInt(qtdCrianca.value);
-    totalVagas=qtd+cri+(tipo==="casal"?1:0);
-    valor=(qtd*passeios.chapada.valores[tipo][f])+(cri*passeios.chapada.valores.crianca[f]);
+    const a=+qtdAdulto.value;
+    const c=+qtdCrianca.value;
+
+    if(tipo==="casal") boxCasalNomes.style.display="block";
+    else boxCasalNomes.style.display="none";
+
+    vagas = a + c + (tipo==="casal"?1:0);
+    total = a*passeios.chapada.valores[tipo][f] + c*passeios.chapada.valores.crianca[f];
   }
 
   if(passeioAtual==="lagoa"){
-    const a=parseInt(qtdAdulto.value);
-    const c=parseInt(qtdCrianca.value);
-    const car=parseInt(qtdCarro.value);
-    totalVagas=a+c+car;
-    valor=(a*passeios.lagoa.valores.adulto[f])+(c*passeios.lagoa.valores.crianca[f])+(car*passeios.lagoa.valores.carro[f]);
+    const a=+qtdAdulto.value;
+    const c=+qtdCrianca.value;
+    const car=+qtdCarro.value;
+    vagas = a+c+car;
+    total = a*passeios.lagoa.valores.adulto[f] +
+            c*passeios.lagoa.valores.crianca[f] +
+            car*passeios.lagoa.valores.carro[f];
   }
 
   if(passeioAtual==="vale"){
-    const a=parseInt(qtdAdulto.value);
-    const c=parseInt(qtdCrianca.value);
-    totalVagas=a+c;
-    valor=(a*passeios.vale.valores.adulto[f])+(c*passeios.vale.valores.crianca[f]);
+    const a=+qtdAdulto.value;
+    const c=+qtdCrianca.value;
+    vagas = a+c;
+    total = a*passeios.vale.valores.adulto[f] +
+            c*passeios.vale.valores.crianca[f];
   }
 
-  total.innerText=totalVagas?`🎟️ ${totalVagas} vagas | 💰 R$ ${valor}`:"💰 Selecione as vagas";
+  totalBox.innerText = vagas>0 ? `🎟️ ${vagas} vagas | 💰 R$ ${total}` : "";
+  resumo.innerHTML = `
+<b>${passeios[passeioAtual].nome}</b><br>
+Adultos: ${qtdAdulto.value}<br>
+Crianças: ${qtdCrianca.value}<br>
+${passeioAtual==="lagoa"?"Veículo próprio: "+qtdCarro.value+"<br>":""}
+${tipoHospedagem.value==="casal"?"Casal: "+nomeCasal1.value+" / "+nomeCasal2.value+"<br>":""}
+Valor total: R$ ${total}
+`;
 }
 
 function confirmar(){
-  if(!nomeCliente.value.trim())return alert("Informe seu nome.");
+  if(!nomeCliente.value.trim()) return alert("Informe seu nome.");
 
-  if(passeioAtual==="chapada"&&tipoHospedagem.value==="casal"){
-    if(!nomeCasal1.value.trim()||!nomeCasal2.value.trim()){
+  if(passeioAtual==="chapada" && tipoHospedagem.value==="casal"){
+    if(!nomeCasal1.value || !nomeCasal2.value)
       return alert("Informe o nome dos dois integrantes do casal.");
-    }
   }
 
   navigator.clipboard.writeText(PIX);
@@ -213,10 +178,7 @@ function confirmar(){
   const msg=`Reserva:
 ${passeios[passeioAtual].nome}
 Nome: ${nomeCliente.value}
-${tipoHospedagem.value==="casal"?"Casal: "+nomeCasal1.value+" / "+nomeCasal2.value:""}
-${total.innerText}
-
-Segue comprovante.`;
+${resumo.innerText}`;
 
   window.open(`https://wa.me/${WHATS}?text=${encodeURIComponent(msg)}`);
 }
@@ -224,7 +186,8 @@ Segue comprovante.`;
 </head>
 
 <body>
-<div class="container"><div class="card">
+<div class="container">
+<div class="card">
 
 <div class="banner"><img id="banner"></div>
 
@@ -244,7 +207,7 @@ Segue comprovante.`;
 
 <div id="boxHospedagem">
 <label>Hospedagem</label>
-<select id="tipoHospedagem" onchange="controlarCampos();atualizar()">
+<select id="tipoHospedagem" onchange="atualizar()">
 <option value="camping">🏕️ Camping</option>
 <option value="compartilhado">🛏️ Quarto compartilhado</option>
 <option value="casal">🛌 Quarto de casal</option>
@@ -259,17 +222,18 @@ Segue comprovante.`;
 </div>
 
 <label>Adultos</label>
-<select id="qtdAdulto" onchange="atualizar()"><option>0</option><option>1</option><option>2</option></select>
+<select id="qtdAdulto" onchange="atualizar()"><option>0</option><option>1</option><option>2</option><option>3</option></select>
 
 <label>Crianças até 10 anos</label>
 <select id="qtdCrianca" onchange="atualizar()"><option>0</option><option>1</option><option>2</option></select>
 
 <div id="boxCarro">
 <label>Veículo próprio (Lagoa Azul)</label>
-<select id="qtdCarro" onchange="atualizar()"><option>0</option><option>1</option></select>
+<select id="qtdCarro" onchange="atualizar()"><option>0</option><option>1</option><option>2</option></select>
 </div>
 
-<div class="total" id="total"></div>
+<div class="total" id="totalBox"></div>
+<div class="resumo" id="resumo"></div>
 
 <label>Forma de pagamento</label>
 <select id="pagamento" onchange="atualizar()">
@@ -279,9 +243,10 @@ Segue comprovante.`;
 
 <p class="aviso-final">⚠️ A vaga só é garantida após envio do comprovante.</p>
 
-<button class="btn pix" onclick="confirmar()">CONFIRMAR E ENVIAR COMPROVANTE</button>
+<button class="btn" onclick="confirmar()">CONFIRMAR E ENVIAR COMPROVANTE</button>
 
-</div></div>
+</div>
+</div>
 
 <script>carregar();</script>
 </body>
