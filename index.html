@@ -1,229 +1,179 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Trilheiros de Rondonópolis — Passeios</title>
-  <style>
-    :root{--green:#2f8a63;--accent:#0b74da;--bg:#f6f7fb;--card:#fff}
-    body{font-family:Inter, system-ui, Arial, sans-serif;background:var(--bg);margin:0;color:#203042}
-    header{background:linear-gradient(90deg,var(--green),#3fb08a);color:white;padding:28px 16px}
-    .container{max-width:980px;margin:18px auto;padding:0 16px}
-    h1{margin:0 0 6px;font-size:22px}
-    p.lead{margin:0;opacity:.95}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:18px}
-    .card{background:var(--card);border-radius:12px;padding:14px;box-shadow:0 6px 18px rgba(18,27,38,.06)}
-    .card h3{margin:0 0 8px;font-size:18px}
-    .meta{font-size:13px;color:#5b6b7a;margin-bottom:8px}
-    .price{font-weight:700;color:var(--green)}
-    .btn{display:inline-block;padding:10px 14px;border-radius:10px;background:var(--accent);color:white;text-decoration:none;font-weight:600}
-    .btn.secondary{background:transparent;border:2px solid #e6e9ef;color:var(--accent)}
-    footer{max-width:980px;margin:30px auto;padding:16px;color:#415565}
-    .small{font-size:13px;color:#6c7a89}
-    /* modal */
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:20px}
-    .modal.open{display:flex}
-    .modal-card{background:#fff;padding:18px;border-radius:10px;max-width:520px;width:100%;box-shadow:0 10px 30px rgba(2,6,23,.35)}
-    label{display:block;font-size:13px;margin-top:10px}
-    input,select{width:100%;padding:9px;border-radius:8px;border:1px solid #dde4ef;margin-top:6px}
-    .row{display:flex;gap:10px}
-    .muted{color:#7c8896;font-size:13px}
-    .badge{display:inline-block;background:#f0f8f6;color:#0b5a3f;padding:4px 8px;border-radius:999px;font-weight:700;margin-left:8px}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Passeios 2026</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+body{margin:0;background:#0c0c0c;font-family:Poppins,sans-serif;color:#fff}
+.container{max-width:500px;margin:auto;padding:14px}
+.card{background:#151515;border-radius:22px;padding:16px;box-shadow:0 0 25px rgba(0,0,0,.7)}
+select,input{width:100%;padding:14px;border-radius:14px;border:none;background:#2a2a2a;color:#fff}
+label{margin-top:10px;display:block;font-weight:600}
+.banner img{width:100%;border-radius:18px;margin-bottom:10px}
+.titulo{text-align:center;font-size:22px;font-weight:700}
+.desc{font-size:14px;color:#ddd;line-height:1.5}
+.contador{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.contador button{width:44px;height:44px;border:none;border-radius:12px;background:#333;color:#fff;font-size:22px}
+.info{text-align:center;margin-top:10px;font-size:14px}
+.total{font-size:22px;font-weight:700;text-align:center;color:#00ff9c;margin-top:8px}
+.btn{width:100%;margin-top:14px;padding:18px;border-radius:50px;border:none;font-size:18px;font-weight:700;color:#fff}
+.pix{background:linear-gradient(135deg,#00ff9c,#00c96b)}
+.whats{background:linear-gradient(135deg,#25d366,#1ebd5c)}
+.alerta{background:#550000;padding:10px;border-radius:12px;text-align:center;margin-top:10px;display:none}
+</style>
+
+<script>
+const PIX = "trilheiros.roomt@gmail.com";
+const WHATS = "5566996926174";
+
+let passeioAtual = "chapada";
+let qtd = 1;
+
+const passeios = {
+  chapada:{
+    nome:"Chapada dos Guimarães",
+    vagas:30,
+    banner:"https://i.postimg.cc/vZLwxjSc/Copia-de-Post-instagram-dia-dos-povos-indigenas-ousado-verde.png",
+    opcoes:{
+      camping:{pix:360,cartao:380},
+      compartilhado:{pix:420,cartao:440},
+      casal:{pix:560,cartao:590}
+    }
+  },
+  lagoa:{
+    nome:"Lagoa Azul",
+    vagas:28,
+    banner:"https://i.postimg.cc/7hYnXCqs/Instagram-Post-Agencia-de-Viagem-Moderno-Azul-e-Branco.png",
+    opcoes:{
+      adulto:{pix:336,cartao:340},
+      crianca:{pix:280,cartao:280},
+      carro:{pix:215,cartao:215}
+    }
+  },
+  vale:{
+    nome:"Vale do Chico",
+    vagas:28,
+    banner:"https://i.postimg.cc/9fb4bL0K/Travel-Instagram-Post-in-Blue-Green-Refined-Scrapbook-Style.png",
+    opcoes:{
+      individual:{pix:365,cartao:379},
+      casal:{pix:700,cartao:729},
+      crianca:{pix:295,cartao:309}
+    }
+  }
+};
+
+function carregar(){
+  const p = passeios[passeio.value];
+  banner.src = p.banner;
+  titulo.innerText = p.nome;
+  vagas.innerText = p.vagas;
+  opcao.innerHTML = "";
+  for(let o in p.opcoes){
+    opcao.innerHTML += `<option value="${o}">${o.toUpperCase()}</option>`;
+  }
+  atualizar();
+}
+
+function atualizar(){
+  const p = passeios[passeio.value];
+  const tipo = opcao.value;
+  const forma = pagamento.value;
+  const valor = p.opcoes[tipo][forma] * qtd;
+  total.innerText = "💰 Total: R$ " + valor;
+}
+
+function mais(){qtd++;quantidade.innerText=qtd;atualizar();}
+function menos(){if(qtd>1){qtd--;quantidade.innerText=qtd;atualizar();}}
+
+function pagar(){
+  const nome = nomeCliente.value.trim();
+  if(!nome) return alert("Informe seu nome");
+
+  const p = passeios[passeio.value];
+  if(qtd > p.vagas){
+    alerta.style.display="block";
+    return;
+  }
+
+  p.vagas -= qtd;
+  vagas.innerText = p.vagas;
+
+  if(p.vagas <= 0){
+    alerta.style.display="block";
+    alerta.innerText="❌ VAGAS PREENCHIDAS";
+  }
+
+  if(pagamento.value === "pix"){
+    navigator.clipboard.writeText(PIX);
+    alert("PIX copiado!");
+  }else{
+    alert("Para cartão, fale com o Jonatas para gerar o link.");
+  }
+
+  const msg = `Olá! Reserva confirmada:
+Passeio: ${p.nome}
+Nome: ${nome}
+Opção: ${opcao.value}
+Vagas: ${qtd}
+Valor: ${total.innerText}`;
+
+  window.open(`https://wa.me/${WHATS}?text=${encodeURIComponent(msg)}`);
+}
+</script>
 </head>
+
 <body>
-  <header>
-    <div class="container">
-      <h1>Trilheiros de Rondonópolis — Passeios</h1>
-      <p class="lead">Escolha o passeio, reserve e pague online. Após o pagamento você recebe o link do grupo automaticamente. 🌿🚙</p>
-    </div>
-  </header>
+<div class="container">
+<div class="card">
 
-  <main class="container">
-    <section>
-      <div class="grid" id="tours-grid">
-        <!-- Cards de passeios (padrão/hardcoded) -->
+<label>Escolha o passeio</label>
+<select id="passeio" onchange="carregar()">
+  <option value="chapada">Chapada dos Guimarães</option>
+  <option value="lagoa">Lagoa Azul</option>
+  <option value="vale">Vale do Chico</option>
+</select>
 
-        <article class="card" data-id="morrodamesa" data-total="40" data-reserved="12" data-price-pix="332.00" data-price-card="339.00" data-child-price="282.00" >
-          <h3>Morro da Mesa — Poxoréu <span class="badge">Vagas: <span class="vacancies">28</span></span></h3>
-          <div class="meta">30/11 — 02:30 às 09:00 • Incluso café da manhã, almoço e condutor local</div>
-          <div style="margin:10px 0"><div class="price">R$ <span class="price-pix">332,00</span> (Pix) • R$ <span class="price-card">339,00</span> (Cartão)</div>
-          <div class="small muted">Crianças até 10 anos: R$ <span class="price-child">282,00</span></div></div>
-          <div style="display:flex;gap:10px;align-items:center;margin-top:8px">
-            <a href="#" class="btn reserve-btn">Reservar</a>
-            <a class="btn secondary" href="#" onclick="showInfo(event)">Mais info</a>
-          </div>
-        </article>
+<div class="banner">
+<img id="banner">
+</div>
 
-        <article class="card" data-id="carima" data-total="30" data-reserved="6" data-price-pix="280.00" data-price-card="289.00" data-child-price="240.00">
-          <h3>Cachoeiras do Carimã — 50 km de Rondonópolis <span class="badge">Vagas: <span class="vacancies">24</span></span></h3>
-          <div class="meta">Próxima data: 12/12 • Trilha leve entre mata fechada e quedas d'água</div>
-          <div style="margin:10px 0"><div class="price">R$ <span class="price-pix">280,00</span> (Pix) • R$ <span class="price-card">289,00</span> (Cartão)</div></div>
-          <div style="display:flex;gap:10px;align-items:center;margin-top:8px">
-            <a href="#" class="btn reserve-btn">Reservar</a>
-            <a class="btn secondary" href="#" onclick="showInfo(event)">Mais info</a>
-          </div>
-        </article>
+<div class="titulo" id="titulo"></div>
 
-        <article class="card" data-id="lagoaazul" data-total="20" data-reserved="3" data-price-pix="340.00" data-price-card="349.00" data-child-price="0">
-          <h3>Lagoa Azul — Primavera do Leste <span class="badge">Vagas: <span class="vacancies">17</span></span></h3>
-          <div class="meta">13/04/2025 • Águas cristalinas e paisagem incrível</div>
-          <div style="margin:10px 0"><div class="price">R$ <span class="price-pix">340,00</span> (Pix) • R$ <span class="price-card">349,00</span></div></div>
-          <div style="display:flex;gap:10px;align-items:center;margin-top:8px">
-            <a href="#" class="btn reserve-btn">Reservar</a>
-            <a class="btn secondary" href="#" onclick="showInfo(event)">Mais info</a>
-          </div>
-        </article>
+<label>Nome completo</label>
+<input id="nomeCliente">
 
-      </div>
-    </section>
+<label>Opção</label>
+<select id="opcao" onchange="atualizar()"></select>
 
-    <p class="small muted" style="margin-top:18px">Obs: ao confirmar o pagamento, você receberá automaticamente o link do grupo de confirmados no WhatsApp. Não é possível adicionar pessoas ao grupo sem link por questões de privacidade — o link será enviado após a confirmação.</p>
-  </main>
+<label>Quantidade</label>
+<div class="contador">
+<button onclick="menos()">−</button>
+<span id="quantidade">1</span>
+<button onclick="mais()">+</button>
+</div>
 
-  <!-- modal de reserva -->
-  <div id="modal" class="modal" aria-hidden="true">
-    <div class="modal-card">
-      <div id="modal-content">
-        <h3 id="modal-title">Reservar</h3>
-        <p class="muted" id="modal-sub">Preencha os dados para prosseguir ao pagamento.</p>
+<div class="info">🎟️ Vagas restantes: <b id="vagas"></b></div>
 
-        <form id="reserve-form">
-          <input type="hidden" name="tour_id" id="tour_id">
-          <label>Nome completo<input name="name" id="name" required></label>
-          <label>WhatsApp (com DDD)<input name="phone" id="phone" required placeholder="6599999-9999"></label>
-          <label>Quantidade de vagas<select name="quantity" id="quantity">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-          </select></label>
+<label>Pagamento</label>
+<select id="pagamento" onchange="atualizar()">
+  <option value="pix">PIX</option>
+  <option value="cartao">Cartão</option>
+</select>
 
-          <label>Método de pagamento<select name="method" id="method">
-            <option value="pix">Pix</option>
-            <option value="card">Cartão</option>
-          </select></label>
+<div id="total" class="total"></div>
 
-          <div style="margin-top:12px;display:flex;gap:10px;align-items:center">
-            <button type="submit" class="btn">Ir para pagamento</button>
-            <button type="button" class="btn secondary" onclick="closeModal()">Cancelar</button>
-          </div>
+<button class="btn pix" onclick="pagar()">CONFIRMAR</button>
 
-          <p class="small muted" style="margin-top:10px">Ao confirmar, você será redirecionado ao checkout. Após o pagamento confirmado, recebendo o link do grupo pelo WhatsApp.</p>
-        </form>
-      </div>
-    </div>
-  </div>
+<div id="alerta" class="alerta">❌ VAGAS PREENCHIDAS</div>
 
-  <footer>
-    <div class="container">
-      <div class="small">© Trilheiros de Rondonópolis • Desenvolvido por Jonatas • Integração: Mercado Pago + Make/Zapier + Airtable</div>
-    </div>
-  </footer>
+</div>
+</div>
 
-  <script>
-    // CONFIG -- substitua pelas suas URLs/ENDPOINTS reais
-    const MAKE_RESERVATION_WEBHOOK = 'https://HOOK_DO_MAKE_AQUI'; // receberá POST com dados da reserva e retornará { success: true, checkout_url: 'https://...' }
-    const TOURS_JSON_ENDPOINT = null; // opcional: endpoint que retorna JSON com passeios atualizados
-
-    // Inicializa vacâncias exibidas (leva em conta data attributes)
-    document.querySelectorAll('.card').forEach(card => {
-      const total = parseInt(card.dataset.total || '0',10);
-      const reserved = parseInt(card.dataset.reserved || '0',10);
-      const remaining = Math.max(total - reserved, 0);
-      card.querySelectorAll('.vacancies').forEach(el => el.textContent = remaining);
-      if(remaining <= 0){
-        card.querySelectorAll('.reserve-btn').forEach(b=>{b.textContent='ESGOTADO';b.classList.add('disabled');b.style.opacity=.6;b.href='#';b.onclick=(e)=>e.preventDefault();});
-      }
-    });
-
-    // Abre modal
-    document.querySelectorAll('.reserve-btn').forEach(btn => btn.addEventListener('click', (e)=>{
-      e.preventDefault();
-      const card = e.target.closest('.card');
-      openModal(card);
-    }));
-
-    function openModal(card){
-      const id = card.dataset.id;
-      const pix = card.dataset.pricePix || card.dataset.pricePix || card.dataset.pricePix;
-      document.getElementById('modal-title').textContent = 'Reservar — ' + card.querySelector('h3').childNodes[0].textContent.trim();
-      document.getElementById('tour_id').value = id;
-      document.getElementById('modal').classList.add('open');
-      document.getElementById('modal').setAttribute('aria-hidden','false');
-    }
-    function closeModal(){
-      document.getElementById('modal').classList.remove('open');
-      document.getElementById('modal').setAttribute('aria-hidden','true');
-    }
-
-    // Submissão do formulário: envia para webhook no Make que deve criar preferência MP e retornar URL de checkout
-    document.getElementById('reserve-form').addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      const tour_id = document.getElementById('tour_id').value;
-      const name = document.getElementById('name').value.trim();
-      const phone = document.getElementById('phone').value.trim();
-      const quantity = parseInt(document.getElementById('quantity').value,10) || 1;
-      const method = document.getElementById('method').value;
-
-      if(!MAKE_RESERVATION_WEBHOOK || MAKE_RESERVATION_WEBHOOK.includes('HOOK_DO_MAKE')){
-        alert('Substitua MAKE_RESERVATION_WEBHOOK no código com o webhook do Make/Zapier antes de testar.');
-        return;
-      }
-
-      const payload = { tour_id, name, phone, quantity, method, source: 'github_pages' };
-      try{
-        const res = await fetch(MAKE_RESERVATION_WEBHOOK, {
-          method: 'POST',
-          headers:{ 'Content-Type':'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        if(data && data.success && data.checkout_url){
-          // redireciona para o checkout (Mercado Pago)
-          window.location.href = data.checkout_url;
-        }else{
-          alert('Erro ao criar reserva. Verifique o webhook do Make.');
-          console.error('Resposta do Make:', data);
-        }
-      }catch(err){
-        console.error(err);
-        alert('Erro de conexão. Confira a URL do webhook no código.');
-      }
-    });
-
-    // Opcional: função para atualizar cards dinamicamente via endpoint (Airtable/Make)
-    async function fetchToursAndUpdate(){
-      if(!TOURS_JSON_ENDPOINT) return;
-      try{
-        const r = await fetch(TOURS_JSON_ENDPOINT);
-        const tours = await r.json();
-        // estrutura esperada: [{id, title, date, total, reserved, price_pix, price_card, child_price, info_text, whatsapp_link}]
-        const grid = document.getElementById('tours-grid');
-        grid.innerHTML = '';
-        tours.forEach(t=>{
-          const remaining = Math.max((t.total||0)-(t.reserved||0),0);
-          const card = document.createElement('article');
-          card.className='card';
-          card.dataset.id=t.id; card.dataset.total=t.total; card.dataset.reserved=t.reserved;
-          card.innerHTML = `<h3>${t.title} <span class="badge">Vagas: <span class="vacancies">${remaining}</span></span></h3>`+
-            `<div class="meta">${t.date} • ${t.info_text||''}</div>`+
-            `<div style="margin:10px 0"><div class="price">R$ <span class="price-pix">${(t.price_pix||0).toFixed(2)}</span> (Pix) • R$ <span class="price-card">${(t.price_card||0).toFixed(2)}</span> (Cartão)</div></div>`+
-            `<div style="display:flex;gap:10px;align-items:center;margin-top:8px">`+
-            `<a href="#" class="btn reserve-btn">Reservar</a>`+
-            `<a class="btn secondary" href="#" onclick="showInfo(event)">Mais info</a>`+
-            `</div>`;
-          grid.appendChild(card);
-        });
-        // reattach handlers
-        document.querySelectorAll('.reserve-btn').forEach(btn => btn.addEventListener('click', (e)=>{e.preventDefault();const card = e.target.closest('.card');openModal(card);}));
-      }catch(err){console.error('Erro ao carregar tours:',err)}
-    }
-
-    function showInfo(e){e.preventDefault();alert('Mais informações sobre o passeio. Edite o texto no HTML ou use o endpoint dinâmico para carregar informações detalhadas.');}
-
-    // se usar endpoint dinâmico, descomente abaixo
-    // fetchToursAndUpdate();
-  </script>
+<script>carregar();</script>
 </body>
 </html>
+
