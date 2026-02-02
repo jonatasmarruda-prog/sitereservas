@@ -1,209 +1,28 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chapada dos Guimarães – Reserva</title>
+if(pagamento.value === "cartao"){
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-
-<style>
-body{margin:0;background:#0f0f0f;font-family:Poppins,sans-serif;color:#fff}
-.container{max-width:520px;margin:auto;padding:14px}
-.card{background:#181818;border-radius:22px;padding:16px;box-shadow:0 0 25px rgba(0,0,0,.7)}
-.banner img{width:100%;border-radius:18px}
-label{margin-top:12px;display:block;font-weight:600}
-select,input{
-  width:100%;
-  padding:14px;
-  border-radius:14px;
-  border:none;
-  background:#2a2a2a;
-  color:#fff;
-}
-.info{text-align:center;margin-top:6px;font-size:14px}
-.total{font-size:22px;font-weight:700;text-align:center;color:#00ff9c;margin-top:10px}
-.ultimas{
-  display:none;
-  background:#ff1744;
-  padding:10px;
-  border-radius:12px;
-  text-align:center;
-  font-weight:700;
-  margin-top:8px;
-  animation:pulse .8s infinite;
-}
-@keyframes pulse{0%{opacity:1}50%{opacity:.5}100%{opacity:1}}
-.esgotado{
-  display:none;
-  background:#550000;
-  padding:12px;
-  border-radius:12px;
-  text-align:center;
-  font-weight:700;
-  margin-top:10px;
-}
-.btn{
-  width:100%;
-  margin-top:16px;
-  padding:18px;
-  border-radius:50px;
-  border:none;
-  font-size:18px;
-  font-weight:700;
-  background:linear-gradient(135deg,#00ff9c,#00c96b);
-  cursor:pointer;
-}
-</style>
-
-<script>
-const PIX="trilheiros.roomt@gmail.com";
-const WHATS="5566996926174";
-
-const CARTAO={
-  casal_transporte:"https://mpago.li/1szssQp",
-  casal_carro:"https://mpago.li/2iuq5uT"
-};
-
-const valores={
-  compartilhado_transporte:{pix:420,cartao:440},
-  casal_transporte:{pix:740,cartao:760},
-  compartilhado_carro:{pix:330,cartao:350},
-  casal_carro:{pix:510,cartao:530}
-};
-
-let vagasTotais=30;
-let vagasDisponiveis;
-
-function iniciar(){
-  vagasDisponiveis = localStorage.getItem("vagas_chapada");
-  if(vagasDisponiveis === null){
-    vagasDisponiveis = vagasTotais;
-    localStorage.setItem("vagas_chapada", vagasDisponiveis);
-  }
-  vagasDisponiveis = parseInt(vagasDisponiveis);
-  atualizar();
-}
-
-function atualizar(){
-  const opcao = document.getElementById("opcaoReserva").value;
-  const qtd = parseInt(document.getElementById("qtdVagas").value);
-  const forma = document.getElementById("pagamento").value;
-
-  document.getElementById("infoVagas").innerHTML =
-    `🎟️ Vagas restantes: <b>${vagasDisponiveis}</b>`;
-
-  document.getElementById("ultimas").style.display =
-    (vagasDisponiveis <= 5 && vagasDisponiveis > 0) ? "block" : "none";
-
-  document.getElementById("esgotado").style.display =
-    (vagasDisponiveis <= 0) ? "block" : "none";
-
-  if(vagasDisponiveis <= 0 || qtd === 0){
-    document.getElementById("total").innerText = "";
+  if(qtd > 1){
+    alert("Para mais de uma vaga no cartão, fale com o Jonatas para gerar um novo link.");
     return;
   }
 
-  if(qtd > vagasDisponiveis){
-    document.getElementById("total").innerText =
-      "⚠️ Quantidade maior que as vagas disponíveis";
+  // CARTÃO para QUARTO COMPARTILHADO COM TRANSPORTE
+  if(opcao === "compartilhado_transporte"){
+    window.open("https://mpago.li/1VoTeFx", "_blank");
+    alert("Após o pagamento, envie o comprovante para garantir sua vaga.");
     return;
   }
 
-  const total = qtd * valores[opcao][forma];
-  document.getElementById("total").innerText =
-    `🎟️ ${qtd} vaga(s) | 💰 R$ ${total}`;
-}
-
-function confirmar(){
-  const nome = document.getElementById("nomeCliente").value.trim();
-  if(!nome) return alert("Informe seu nome.");
-
-  const opcao = document.getElementById("opcaoReserva").value;
-  const qtd = parseInt(document.getElementById("qtdVagas").value);
-  const forma = document.getElementById("pagamento").value;
-
-  if(qtd > vagasDisponiveis) return;
-
-  if(forma === "pix"){
-    navigator.clipboard.writeText(PIX);
-    alert("PIX copiado! Envie o comprovante para garantir sua vaga.");
-  }else{
-    if(qtd > 1){
-      alert("Para mais de uma vaga no cartão, fale com o Jonatas para gerar um novo link.");
-      return;
-    }
-    if(CARTAO[opcao]){
-      window.open(CARTAO[opcao], "_blank");
-      alert("Após o pagamento, envie o comprovante.");
-    }else{
-      alert("Pagamento no cartão disponível apenas para opções de casal.");
-      return;
-    }
+  // CARTÃO PARA CASAL COM TRANSPORTE
+  if(opcao === "casal_transporte"){
+    window.open(CARTAO_CHAPADA[opcao], "_blank");
+    alert("Após o pagamento, envie o comprovante para garantir sua vaga.");
+    return;
   }
 
-  vagasDisponiveis -= qtd;
-  localStorage.setItem("vagas_chapada", vagasDisponiveis);
-
-  const msg =
-`Reserva – Chapada dos Guimarães
-Nome: ${nome}
-Opção: ${document.getElementById("opcaoReserva").selectedOptions[0].text}
-Quantidade: ${qtd}
-
-Envio o comprovante para garantir minha vaga.`;
-
-  window.open(`https://wa.me/${WHATS}?text=${encodeURIComponent(msg)}`);
-  atualizar();
+  // CASO NÃO TENHA LINK
+  alert("Pagamento no cartão disponível apenas para opções com link definido ou fale com o Jonatas.");
+  return;
 }
-</script>
-</head>
 
-<body onload="iniciar()">
-<div class="container">
-<div class="card">
-
-<div class="banner">
-<img src="https://i.postimg.cc/vZLwxjSc/Copia-de-Post-instagram-dia-dos-povos-indigenas-ousado-verde.png">
-</div>
-
-<label>Nome completo</label>
-<input id="nomeCliente">
-
-<label>Escolha sua opção</label>
-<select id="opcaoReserva" onchange="atualizar()">
-  <option value="compartilhado_transporte">🛏️ Quarto compartilhado – transporte incluso</option>
-  <option value="casal_transporte">🛌 Quarto casal – transporte incluso</option>
-  <option value="compartilhado_carro">🚗 Carro próprio – quarto compartilhado</option>
-  <option value="casal_carro">🚗 Carro próprio – quarto casal</option>
-</select>
-
-<label>Quantidade de vagas</label>
-<select id="qtdVagas" onchange="atualizar()">
-  <option value="0">0</option>
-  <option value="1">1</option><option value="2">2</option><option value="3">3</option>
-  <option value="4">4</option><option value="5">5</option>
-  <option value="6">6</option><option value="7">7</option>
-  <option value="8">8</option><option value="9">9</option><option value="10">10</option>
-</select>
-
-<div id="infoVagas" class="info"></div>
-<div id="ultimas" class="ultimas">⚠️ ÚLTIMAS VAGAS</div>
-<div id="esgotado" class="esgotado">❌ VAGAS ESGOTADAS</div>
-
-<div id="total" class="total"></div>
-
-<label>Forma de pagamento</label>
-<select id="pagamento" onchange="atualizar()">
-  <option value="pix">PIX</option>
-  <option value="cartao">Cartão de crédito</option>
-</select>
-
-<button class="btn" onclick="confirmar()">CONFIRMAR E ENVIAR COMPROVANTE</button>
-
-</div>
-</div>
-</body>
-</html>
 
 
