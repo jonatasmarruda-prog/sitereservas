@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -53,18 +51,35 @@ select,input{
 .info{text-align:center;margin-top:6px;font-size:14px}
 .total{font-size:22px;font-weight:700;text-align:center;color:#00ff9c;margin-top:8px}
 
+.resumo{
+  background:#1f1f1f;
+  border-radius:16px;
+  padding:12px;
+  font-size:14px;
+  margin-top:10px;
+  line-height:1.6;
+}
+
 .ultimas{
   display:none;
-  background:#ff9800;
-  color:#000;
+  background:#ff1744;
+  color:#fff;
   font-weight:800;
   text-align:center;
-  padding:10px;
-  border-radius:12px;
+  padding:12px;
+  border-radius:14px;
   margin-top:8px;
-  animation:pulse 1s infinite;
+  animation:pulse 0.8s infinite;
+  box-shadow:0 0 15px rgba(255,23,68,.8);
 }
 @keyframes pulse{0%{opacity:1}50%{opacity:.5}100%{opacity:1}}
+
+.aviso-final{
+  font-size:13px;
+  color:#ccc;
+  text-align:center;
+  margin-top:10px;
+}
 
 .btn{
   width:100%;
@@ -77,7 +92,8 @@ select,input{
   color:#fff;
 }
 .pix{background:linear-gradient(135deg,#00ff9c,#00c96b)}
-.whats{background:linear-gradient(135deg,#25d366,#1ebd5c)}
+
+button:disabled{opacity:.4}
 
 .alerta{
   display:none;
@@ -100,13 +116,12 @@ const passeios = {
     banner:"https://i.postimg.cc/vZLwxjSc/Copia-de-Post-instagram-dia-dos-povos-indigenas-ousado-verde.png",
     vagasKey:"vagas_chapada",
     vagasTotal:30,
-    texto:"🏕️ Camping | 🛏️ Quarto compartilhado | 🛌 Casal<br>👶 Crianças até 10 anos: compartilhado R$ 320",
+    texto:"👶 Crianças até 10 anos no quarto compartilhado: R$ 320<br>ℹ️ Valores individuais",
     valores:{
       adulto:{ pix:360, cartao:380 },
       crianca:{ pix:320, cartao:320 }
     }
   },
-
   lagoa:{
     nome:"Lagoa Azul",
     banner:"https://i.postimg.cc/7hYnXCqs/Instagram-Post-Agencia-de-Viagem-Moderno-Azul-e-Branco.png",
@@ -119,26 +134,36 @@ const passeios = {
       carro:{ pix:215, cartao:215 }
     }
   },
-
   vale:{
     nome:"Vale do Chico",
     banner:"https://i.postimg.cc/9fb4bL0K/Travel-Instagram-Post-in-Blue-Green-Refined-Scrapbook-Style.png",
     vagasKey:"vagas_vale",
     vagasTotal:28,
-    texto:"💑 Casal equivale a 2 vagas<br>👶 Crianças até 10 anos têm valor diferenciado",
+    texto:"👶 Crianças até 10 anos têm valor diferenciado<br>ℹ️ Passeio individual",
     valores:{
       adulto:{ pix:365, cartao:379 },
-      crianca:{ pix:295, cartao:309 },
-      casal:{ pix:700, cartao:729 }
+      crianca:{ pix:295, cartao:309 }
     }
   }
 };
 
 let passeioAtual="chapada", vagasDisponiveis=0;
 
+function resetarCampos(){
+  qtdAdulto.value=0;
+  qtdCrianca.value=0;
+  if(qtdCarro) qtdCarro.value=0;
+}
+
+function controlarCampos(){
+  boxCarro.style.display="none";
+  if(passeioAtual==="lagoa") boxCarro.style.display="block";
+}
+
 function carregar(){
-  const p=passeios[passeio.value];
   passeioAtual=passeio.value;
+  const p=passeios[passeioAtual];
+
   banner.src=p.banner;
   titulo.innerText=p.nome;
   descricao.innerHTML=p.texto;
@@ -150,21 +175,23 @@ function carregar(){
   }
   vagasDisponiveis=parseInt(vagasDisponiveis);
 
+  resetarCampos();
+  controlarCampos();
   atualizar();
 }
 
 function atualizar(){
   const adultos=parseInt(qtdAdulto.value);
   const criancas=parseInt(qtdCrianca.value);
-  const carro=parseInt(qtdCarro.value||0);
-  const casais=parseInt(qtdCasal.value||0);
+  const carro=parseInt(qtdCarro?.value||0);
 
-  let totalVagas=adultos+criancas+carro+(casais*2);
+  const totalVagas=adultos+criancas+carro;
 
   infoVagas.innerHTML=`🎟️ Vagas restantes: <b>${vagasDisponiveis}</b>`;
 
   if(totalVagas===0){
     total.innerText="💰 Selecione as vagas";
+    resumo.innerHTML="";
     return;
   }
 
@@ -176,47 +203,53 @@ function atualizar(){
   const f=pagamento.value;
   const v=passeios[passeioAtual].valores;
 
-  let valor=
+  const valor=
     (adultos*(v.adulto?.[f]||0))+
     (criancas*(v.crianca?.[f]||0))+
-    (carro*(v.carro?.[f]||0))+
-    (casais*(v.casal?.[f]||0));
+    (carro*(v.carro?.[f]||0));
 
   total.innerText=`🎟️ ${totalVagas} vagas | 💰 R$ ${valor}`;
 
+  resumo.innerHTML=`
+📍 <b>Passeio:</b> ${passeios[passeioAtual].nome}<br>
+👤 Adultos: ${adultos}<br>
+👶 Crianças: ${criancas}<br>
+${passeioAtual==="lagoa" ? "🚗 Veículo próprio: "+carro+"<br>" : ""}
+🎟️ Total de vagas: ${totalVagas}<br>
+💰 Valor total: R$ ${valor}
+`;
+
   ultimas.style.display=(vagasDisponiveis-totalVagas<=5)?"block":"none";
+
+  if(vagasDisponiveis<=0){
+    btnConfirmar.style.display="none";
+    alerta.style.display="block";
+  }
 }
 
 function confirmar(){
   const nome=nomeCliente.value.trim();
-  if(!nome)return alert("Informe seu nome.");
+  if(!nome)return;
 
   const adultos=parseInt(qtdAdulto.value);
   const criancas=parseInt(qtdCrianca.value);
-  const carro=parseInt(qtdCarro.value||0);
-  const casais=parseInt(qtdCasal.value||0);
-  const totalVagas=adultos+criancas+carro+(casais*2);
+  const carro=parseInt(qtdCarro?.value||0);
+  const totalVagas=adultos+criancas+carro;
 
-  if(totalVagas===0)return alert("Selecione as vagas.");
-  if(totalVagas>vagasDisponiveis)return alert("Vagas insuficientes.");
+  if(totalVagas>vagasDisponiveis)return;
 
   vagasDisponiveis-=totalVagas;
   localStorage.setItem(passeios[passeioAtual].vagasKey,vagasDisponiveis);
 
-  if(pagamento.value==="pix"){
-    navigator.clipboard.writeText(PIX);
-    alert("PIX copiado! Envie o comprovante para garantir sua vaga.");
-  }else{
-    alert("Pagamento no cartão: fale com o Jonatas para gerar o link.\nApós o pagamento, envie o comprovante.");
-  }
+  navigator.clipboard.writeText(PIX);
+  alert("PIX copiado! Envie o comprovante para garantir sua vaga.");
 
   const msg=`Reserva de passeio:
 ${passeios[passeioAtual].nome}
 Nome: ${nome}
 Adultos: ${adultos}
 Crianças: ${criancas}
-Carro próprio: ${carro}
-Casais: ${casais}
+${passeioAtual==="lagoa" ? "Veículo próprio: "+carro+"\n" : ""}
 ${total.innerText}
 
 Segue comprovante para garantir minha vaga.`;
@@ -236,9 +269,9 @@ Segue comprovante para garantir minha vaga.`;
 <div class="escolha-passeio">
 <p>👇 ESCOLHA SEU PASSEIO 👇</p>
 <select id="passeio" onchange="carregar()">
-  <option value="chapada">🌄 Chapada dos Guimarães</option>
-  <option value="lagoa">💙 Lagoa Azul</option>
-  <option value="vale">🌿 Vale do Chico</option>
+<option value="chapada">🌄 Chapada dos Guimarães</option>
+<option value="lagoa">💙 Lagoa Azul</option>
+<option value="vale">🌿 Vale do Chico</option>
 </select>
 </div>
 
@@ -248,29 +281,36 @@ Segue comprovante para garantir minha vaga.`;
 <label>Nome completo</label>
 <input id="nomeCliente">
 
+<div id="boxAdulto">
 <label>Adultos</label>
 <select id="qtdAdulto" onchange="atualizar()">
 <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
 </select>
+</div>
 
+<div id="boxCrianca">
 <label>Crianças até 10 anos</label>
 <select id="qtdCrianca" onchange="atualizar()">
 <option>0</option><option>1</option><option>2</option>
 </select>
+</div>
 
+<div id="boxCarro">
 <label>Veículo próprio (Lagoa Azul)</label>
 <select id="qtdCarro" onchange="atualizar()">
 <option>0</option><option>1</option><option>2</option>
 </select>
-
-<label>Casal (Vale do Chico)</label>
-<select id="qtdCasal" onchange="atualizar()">
-<option>0</option><option>1</option><option>2</option>
-</select>
+</div>
 
 <div id="infoVagas" class="info"></div>
 <div id="ultimas" class="ultimas">⚠️ ÚLTIMAS VAGAS!</div>
 <div id="total" class="total"></div>
+
+<div id="resumo" class="resumo"></div>
+
+<p class="aviso-final">
+⚠️ A vaga só é garantida após o envio do comprovante no WhatsApp.
+</p>
 
 <label>Forma de pagamento</label>
 <select id="pagamento" onchange="atualizar()">
@@ -278,11 +318,20 @@ Segue comprovante para garantir minha vaga.`;
 <option value="cartao">Cartão de crédito</option>
 </select>
 
-<button class="btn pix" onclick="confirmar()">CONFIRMAR E ENVIAR COMPROVANTE</button>
+<button id="btnConfirmar" class="btn pix" onclick="confirmar()" disabled>
+CONFIRMAR E ENVIAR COMPROVANTE
+</button>
+
+<div id="alerta" class="alerta">❌ VAGAS ESGOTADAS</div>
 
 </div>
 </div>
 
-<script>carregar();</script>
+<script>
+nomeCliente.addEventListener("input",()=>{
+  btnConfirmar.disabled=nomeCliente.value.trim()==="";
+});
+carregar();
+</script>
 </body>
 </html>
